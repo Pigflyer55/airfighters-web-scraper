@@ -20,10 +20,14 @@ def info(soup):
     Get information about amount of photos per page and total amount of photos
     """
     data = soup.find("div", class_ = "text-right pr-1 my-2")
-    pages = data.find("span", class_= "text-large text-muted").previous_sibling.string
+    pages = data.find("span", class_= "text-large text-muted").previous_sibling.string.replace('\n', '')
     photosAPage = data.find("span", class_= "text-large text-muted").next_sibling.string
     photosTotal = data.find("span", class_= "d-none d-lg-inline-block").previous_sibling.string
-    return pages, photosAPage, photosTotal
+
+    pagesMatch = re.search(r'\d+', pages).span()
+    pagesNew = pages[pagesMatch[0]:pagesMatch[1]]
+
+    return int(pagesNew), photosAPage, photosTotal
 
 def scrapePages(images = 1000):
     return
