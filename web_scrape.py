@@ -33,9 +33,15 @@ def info(soup):
 def scrapePages(images = 1000):
     return
 
-def downloadImage():
-    
-    print()
+def downloadImage(img_url, imgNum, planeName):
+    try:
+        os.makedirs(planeName)
+    except FileExistsError:
+        pass
+
+    img_data = requests.get(img_url).content
+    with open(planeName + "(" + imgNum + ")" + ".jpg", 'wb') as handler:
+        handler.write(img_data)
 
 def main():
     """ #Dovvnload image code
