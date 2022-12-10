@@ -7,13 +7,13 @@ URL = "https://www.airfighters.com/photosearch.php?key=F-22&pag=2"
 page = requests.get(URL)
 
 #print(page.text)
-"""
+
 soup = BeautifulSoup(page.content, "html.parser")
 jobs = soup.find_all("div", class_="row full-detail-row no-gutters pt-0 mb-5")
 for job_element in jobs:
     found = job_element.find("img", class_ = "img-fluid")
     print(found['src'], end="\n"*2)
-"""
+
 
 def info(soup):
     """
@@ -30,8 +30,29 @@ def info(soup):
 
     return int(pagesMatch), int(photosAPageMatch), int(photosTotalMatch)
 
-def scrapePages(images = 1000):
-    return
+def scrapePages(url, images, name):
+    """
+    :param url: A url of a website
+    :param images: 
+    """
+    pages, photosAPage, totalPhotos = info(BeautifulSoup(requests.get(url).content, "html.parser"))
+    photos = 0
+    url_data = ""
+    print("Total Photos for " + name + " in database: " + str(totalPhotos))
+
+    for i in range(pages):
+        url_data = requests.get(url + "&pag=" + str(i + 1))
+        soup = BeautifulSoup(url_data.content, "html.parser")
+        jobs = soup.find_all("div", class_="row full-detail-row no-gutters pt-0 mb-5")
+        for job_element in jobs:
+            found = job_element.find("img", class_ = "img-fluid")
+            downloadImage("https://www.airfighters.com/" + found['src'], photos, name)
+            photos += 1
+            if photos == images:
+                break
+        if photos == images:
+            break
+
 
 def downloadImage(img_url, imgNum, planeName):
     try:
@@ -40,7 +61,7 @@ def downloadImage(img_url, imgNum, planeName):
         pass
 
     img_data = requests.get(img_url).content
-    with open(planeName + "(" + imgNum + ")" + ".jpg", 'wb') as handler:
+    with open(planeName + "/" + planeName + "_" + str(imgNum) + ".jpg", 'wb') as handler:
         handler.write(img_data)
 
 def main():
@@ -70,8 +91,9 @@ def main():
     #soup.next_sibling
     #jobs = soup.find("div", class_="row no-gutters mb-3")
     found = soup.find("div", class_ = "text-right pr-1 my-2")
-    print(found.find("span", class_= "text-large text-muted").previous_sibling.string)
-    print(info(soup))
+    #print(found.find("span", class_= "text-large text-muted").previous_sibling.string)
+    #print(info(soup))
+    scrapePages(url, 10, aircraft)
 
     
 
