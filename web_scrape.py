@@ -18,6 +18,7 @@ for job_element in jobs:
 def info(soup):
     """
     Get information about total amount of pages, amount of photos per page, and total amount of photos
+    :param soup: Beautiful soup object to extract data from a url
     """
     data = soup.find("div", class_ = "text-right pr-1 my-2")
     pages = data.find("span", class_= "text-large text-muted").previous_sibling.string.replace('\n', '')
@@ -32,8 +33,10 @@ def info(soup):
 
 def scrapePages(url, images, name):
     """
+    Scrapes a webpage for photos of an aircraft and downloads them
     :param url: A url of a website
-    :param images: 
+    :param images: Number of images to download
+    :param name: Name of the aircraft
     """
     pages, photosAPage, totalPhotos = info(BeautifulSoup(requests.get(url).content, "html.parser"))
     photos = 0
@@ -54,13 +57,18 @@ def scrapePages(url, images, name):
             break
 
 
-def downloadImage(img_url, imgNum, planeName):
+def downloadImage(imgUrl, imgNum, planeName):
+    """
+    :param imgUrl: A url of the image to be downloaded
+    :param imgNum: Number to indicate the nth photo downloaded
+    :planeName: Name of the aircraft
+    """
     try:
         os.makedirs(planeName)
     except FileExistsError:
         pass
 
-    img_data = requests.get(img_url).content
+    img_data = requests.get(imgUrl).content
     with open(planeName + "/" + planeName + "_" + str(imgNum) + ".jpg", 'wb') as handler:
         handler.write(img_data)
 
@@ -72,6 +80,7 @@ def main():
         handler.write(img_data)
     """
     aircraft = input("What aircraft do you want images of? ")
+    numImages = int(input("How many images do you want? "))
     url = "https://www.airfighters.com/photosearch.php?key=" + aircraft
     url_data = requests.get(url)
     print(url_data.url)
@@ -93,7 +102,7 @@ def main():
     found = soup.find("div", class_ = "text-right pr-1 my-2")
     #print(found.find("span", class_= "text-large text-muted").previous_sibling.string)
     #print(info(soup))
-    scrapePages(url, 10, aircraft)
+    scrapePages(url, numImages, aircraft)
 
     
 
