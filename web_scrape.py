@@ -43,8 +43,10 @@ def scrapePages(images, name):
         jobs = soup.find_all("div", class_="row full-detail-row no-gutters pt-0 mb-5")
         for job_element in jobs:
             found = job_element.find("img", class_ = "img-fluid")
-            downloadImage("https://www.airfighters.com/" + found['src'], photos, name)
-            photos += 1
+            correct = name.replace('-', ' ')
+            if found['alt'].lower().find(correct.lower()) != -1:
+                downloadImage("https://www.airfighters.com/" + found['src'], photos, name)
+                photos += 1
             if photos == images:
                 return
 
